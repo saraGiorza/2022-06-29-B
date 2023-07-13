@@ -16,7 +16,7 @@ import it.polito.tdp.itunes.model.Track;
 
 public class ItunesDAO {
 	
-	public List<Album> getAllAlbums(){
+	/*public List<Album> getAllAlbums(){
 		final String sql = "SELECT * FROM Album";
 		List<Album> result = new LinkedList<>();
 		
@@ -34,7 +34,7 @@ public class ItunesDAO {
 			throw new RuntimeException("SQL Error");
 		}
 		return result;
-	}
+	}*/
 	
 	public List<Artist> getAllArtists(){
 		final String sql = "SELECT * FROM Artist";
@@ -139,6 +139,30 @@ public class ItunesDAO {
 		return result;
 	}
 	
+	public List<Album> getAlbumsDurata(double soglia){
+		final String sql = "SELECT a.*, SUM(t.Milliseconds) AS durata "
+				+ "FROM album a, track t "
+				+ "WHERE a.AlbumId = t.AlbumId "
+				+ "GROUP BY(a.AlbumId)";
+		List<Album> result = new LinkedList<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+
+			while (res.next()) {
+				if(res.getDouble("durata") > soglia*1000) {
+					result.add(new Album(res.getInt("AlbumId"), res.getString("Title"), res.getDouble("durata")));
+				}
+			}
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL Error");
+		}
+		return result;
+	}
 	
 	
 }

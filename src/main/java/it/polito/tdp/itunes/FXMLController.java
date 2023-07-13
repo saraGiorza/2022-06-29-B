@@ -6,6 +6,8 @@ package it.polito.tdp.itunes;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.itunes.model.Album;
 import it.polito.tdp.itunes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,7 +36,7 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbA1"
-    private ComboBox<?> cmbA1; // Value injected by FXMLLoader
+    private ComboBox<Album> cmbA1; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbA2"
     private ComboBox<?> cmbA2; // Value injected by FXMLLoader
@@ -50,7 +52,14 @@ public class FXMLController {
 
     @FXML
     void doCalcolaAdiacenze(ActionEvent event) {
+    	Album a = this.cmbA1.getValue();
     	
+    	if(a != null) {
+    		this.txtResult.appendText("\n" + model.successoriAlbum(a) + "\n");
+    	}
+    	else {
+    		this.txtResult.appendText("\nPer favore selezionare un album!\n");
+    	}    	
     }
 
     @FXML
@@ -60,6 +69,24 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+    	String input = this.txtN.getText();
+    	if(input.compareTo("") == 0) {
+    		this.txtResult.setText("Per favore inserire un valore per creare il grafo");    		
+    	}
+    	else {
+    		try {
+    			double soglia = Double.parseDouble(input);
+    			model.creaGrafo(soglia);
+    			this.txtResult.setText("\n" + model.infoGrafo() + "\n");
+    			
+    			this.cmbA1.getItems().clear();
+    			this.cmbA1.getItems().addAll(model.verticiGrafo());
+    		}
+    		catch(NumberFormatException nfe) {
+    			this.txtResult.setText("Per favore inserire un numero valido come N (in minuti)");
+    		}
+    	}
     	
     }
 
